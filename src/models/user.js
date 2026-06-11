@@ -41,6 +41,37 @@ userSchema.methods.validatePassword = async function (passwordInputByUser){
 
 }
 
+userSchema.statics.validateMembers = async function(members){
+        if(!Array.isArray(members)){
+            throw new Error("Members must be a valid array");
+        }
+    
+        if(members.length <= 0){
+            throw new Error("Add minimum 1 member");
+        }
+    
+        const invalidMembers = members.filter((member) => (
+            !mongoose.Types.ObjectId.isValid(member)
+        ));
+    
+        if(invalidMembers.length > 0){
+           throw new Error("Cannot add invalid members");
+        }
+    
+        const users = await User.find({_id: {
+            $in: members
+        }},{_id: 1})              //projects only id field of the entire document and not the entire document
+        .lean();                  // to just return the JS object and not the entire thing
+    
+        console.log(users);
+    
+        if(members.length !== users.length){
+            throw new Error("Member(s) dont exist");
+        }
+        
+        return true;
+}
+
 userSchema.index({emailId: 1});
 const User = mongoose.model("User", userSchema);
 
