@@ -3,13 +3,15 @@ import connectDB from "./config/database.js";
 import authRouter from "./routes/auth.js";
 import cookieParser from "cookie-parser";
 import groupRouter from "./routes/group.js";
+import expenseRouter from "./routes/expense.js";
+import settlementRouter from "./routes/settlement.js";
 
 const app = express();
 
 app.use(express.json());
 app.use(cookieParser());
 
-app.use("/", authRouter, groupRouter);
+app.use("/", authRouter, groupRouter, expenseRouter, settlementRouter);
 
 connectDB()
     .then(() => {

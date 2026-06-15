@@ -63,8 +63,6 @@ userSchema.statics.validateMembers = async function(members){
         }},{_id: 1})              //projects only id field of the entire document and not the entire document
         .lean();                  // to just return the JS object and not the entire thing
     
-        console.log(users);
-    
         if(members.length !== users.length){
             throw new Error("Member(s) dont exist");
         }
