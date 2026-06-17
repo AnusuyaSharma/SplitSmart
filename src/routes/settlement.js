@@ -3,6 +3,8 @@ import userAuth from "../middlewares/auth.js";
 import Group from "../models/group.js";
 import Expense from "../models/expense.js";
 import Settlement from "../models/settlement.js";
+import getGroupBalances from "../utils/calculateBalance.js";
+import populateBalanceNames from "../utils/populateBalanceNames.js";
 
 const settlementRouter = express.Router();
 
@@ -78,61 +80,13 @@ settlementRouter.get("/settlement/group/:groupId", userAuth, async(req,res) => {
         if(!group.members.includes(currentUser)){
             return res.status(400).send("Logged in user is not a part of this group!");
         }
-        const allExpenses = await Expense.find({
-            groupId: groupId,
-            "splitAmong.isPaid": false
-        });
-        const rawDebts = [];
-
-        for(const expense of allExpenses){
-            for(const split of expense.splitAmong){
-                if(!split.isPaid && split.user.toString() !== expense.paidBy.toString()){            //the paidBy is also a member of splitAmong so need to skip that user
-                    rawDebts.push({
-                        from: split.user.toString(),
-                        to: expense.paidBy.toString(),         
-                        amount: split.share
-                    })
-                }
-            }
-        }
-
-         const debtMap = {};
-        for(const debt of rawDebts){
-            const key = `${debt.from}__${debt.to}`;
-
-            debtMap[key] = (debtMap[key] || 0) + debt.amount;
-        }
-
-        //Now, need to net out reverse pairs in debtMap ie. A->B and B->A should be one transaction
-        const balances = [];
-        const seen = new Set();
-
-        for(const key of Object.keys(debtMap)){
-            if (seen.has(key)) continue;
-
-            const [from,to] = key.split("__");
-            const reverseKey = `${to}__${from}`;
-
-            const forwardAmount = debtMap[key];
-            const reverseAmount = debtMap[reverseKey] || 0;
-
-            const net = forwardAmount - reverseAmount;
-
-            if(net > 0){
-                balances.push({from,to,amount:net});
-            }
-            else if(net < 0){
-                balances.push({from:to, to:from, amount: Math.abs(net)});
-            }
-
-            seen.add(key);
-            seen.add(reverseKey);
-        }
-
+        
+        const balances = await getGroupBalances(groupId);
+        const populateBalances = await populateBalanceNames(balances);      // To get balances with their names (from and to with their names)
         const history = await Settlement.find({ groupId}).sort({ createdAt: -1});
         return res.status(200).json({
             message: "Successfully fetched the balances and history of settlements for this group!",
-            balances,
+            balances: populateBalances,
             history
         });
     } catch (error) {

@@ -128,4 +128,27 @@ groupRouter.delete("/group/:groupId/member", userAuth, async(req,res) => {
     }
 })
 
+//For deleting a group entirely
+groupRouter.delete("/group/:groupId", userAuth, async(req,res) => {
+    try {
+        const {groupId}= req.params;
+        console.log(groupId);
+        if(!groupId || !mongoose.Types.ObjectId.isValid(groupId)){
+            return res.status(400).send("Invalid group id");
+        }
+        const group = await Group.findById(groupId);
+        if(!group){
+            return res.status(404).send("Group not found!");
+        }
+        const isUserAuthorized = group.createdBy.equals(req.user._id);
+        if(!isUserAuthorized){
+            return res.status(400).send("User not authorized to delete the group!");
+        }
+        await Group.findByIdAndDelete(groupId);
+        return res.status(200).send("Group successfully deleted!");
+    } catch (error) {
+        return res.status(500).send("Error deleting the group");
+    }
+})
+
 export default groupRouter;

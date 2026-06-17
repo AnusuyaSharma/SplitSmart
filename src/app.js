@@ -5,13 +5,14 @@ import cookieParser from "cookie-parser";
 import groupRouter from "./routes/group.js";
 import expenseRouter from "./routes/expense.js";
 import settlementRouter from "./routes/settlement.js";
+import balanceRouter from "./routes/balance.js";
 
 const app = express();
 
 app.use(express.json());
 app.use(cookieParser());
 
-app.use("/", authRouter, groupRouter, expenseRouter, settlementRouter);
+app.use("/", authRouter, groupRouter, expenseRouter, settlementRouter, balanceRouter);
 
 connectDB()
     .then(() => {
