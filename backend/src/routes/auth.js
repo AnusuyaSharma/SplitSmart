@@ -35,9 +35,8 @@ authRouter.post("/login", async(req,res) => {
         const user = await User.findOne({emailId: emailId});
 
         if(!user){
-            res.status(400).send("Invalid credentials");
+            return res.status(400).send("Invalid credentials");
         }
-
         const isPasswordValid = await user.validatePassword(password);
         
         if(isPasswordValid){
@@ -45,22 +44,22 @@ authRouter.post("/login", async(req,res) => {
             res.cookie("token", token, {
                 expires: new Date(Date.now() + 900000),
             });
-            res.send("Login successful");
+            return res.json({
+                message: "Login successful",
+                user
+            });
         }
         else{
-            throw new Error("Invalid credentials");
+            return res.status(400).send("Invalid credentials");
         }
-
     } catch (error) {
         res.status(400).send("Internal server error");        
     }
 })
 
 authRouter.post("/logout", async(req,res) => {
-    res.cookie("token", null, {
-        expires: new Date(Date.now()),
-    });
-    res.send("Logged out successfully!");
+    res.clearCookie("token");
+    return res.send("Logged out successfully!");
 })
 
 authRouter.get("/profile/view", userAuth, async(req,res) => {
@@ -74,13 +73,37 @@ authRouter.get("/profile/view", userAuth, async(req,res) => {
 
 authRouter.patch("/profile/edit", userAuth, async(req,res) => {
     try {
-        const {name} = req.body;
+        const {name, currentPassword, newPassword} = req.body;
 
-        if(!name || typeof name !== "string" || !name.trim()){
-            return res.status(400).send("Name is required and must be a string!");
+
+        if(!name && !newPassword){
+            return res.status(404).send("Provide atleast name or new password to update");
         }
 
-        req.user.name = name.trim();
+        if(name !== undefined){
+            if(!name || typeof name !== "string" || !name.trim()){
+                return res.status(400).send("Name must be a non-empty string!");
+            }
+            req.user.name = name.trim();
+        }
+
+        if(newPassword !== undefined){
+            if(!currentPassword){
+                return res.status(404).send("Current password is required to set a new password!");
+            }
+        }
+
+        if(newPassword !== undefined){
+        if(currentPassword === newPassword){
+            return res.status(400).send("New password must be different from the current password!");
+        }
+        const isMatch = await bcrypt.compare(currentPassword, req.user.password);
+        if(!isMatch && currentPassword !== undefined){
+            return res.status(400).send("Current password incorrect!");
+        }
+        
+        req.user.password = await bcrypt.hash(newPassword, 10);
+    }  
         await req.user.save();
         res.send("Profile updated successfully!");
     } catch (error) {
