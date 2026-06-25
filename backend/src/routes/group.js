@@ -8,21 +8,22 @@ const groupRouter = express.Router();
 
 groupRouter.post("/group/create", userAuth, async(req,res) => {
     try {
-        const {name, members} = req.body;
+        const {name, members, type} = req.body;
         if(!name || !name.trim()){
             return res.status(400).send("Group name is required!");
         }
         
-        await User.validateMembers(members);
+        const memberIds = await User.validateMembers(members);
 
         const creatorId = req.user._id;
 
-        const uniqueMembers = [...new Set([...members, creatorId.toString()]),];
+        const uniqueMembers = [...new Set([...memberIds.map((id) => id.toString()), creatorId.toString()]),];
 
         const group = new Group({
             name: name,
             createdBy: creatorId,
             members: uniqueMembers,
+            type: type,
         });
 
         await group.save();

@@ -8,7 +8,6 @@ const populateBalanceNames = async(balances) => {
         userIds.add(b.to)
     });
 
-    console.log(userIds);
 
     const users = await User.find({_id: {$in:Array.from(userIds)}}, "name");
 

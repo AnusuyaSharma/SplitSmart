@@ -50,24 +50,17 @@ userSchema.statics.validateMembers = async function(members){
             throw new Error("Add minimum 1 member");
         }
     
-        const invalidMembers = members.filter((member) => (
-            !mongoose.Types.ObjectId.isValid(member)
-        ));
-    
-        if(invalidMembers.length > 0){
-           throw new Error("Cannot add invalid members");
-        }
-    
-        const users = await User.find({_id: {
-            $in: members
-        }},{_id: 1})              //projects only id field of the entire document and not the entire document
-        .lean();                  // to just return the JS object and not the entire thing
+        const users = await User.find({emailId: {$in: members}}, 
+            {_id:1})            //projects only id field of the entire document and not the entire document
+            .lean();            // to just return the JS object and not the entire thing
     
         if(members.length !== users.length){
-            throw new Error("Member(s) dont exist");
+            throw new Error("One or more members dont exist");
         }
+
+        const userIds = users.map((user) => user._id);
         
-        return true;
+        return userIds;
 }
 
 userSchema.index({emailId: 1});

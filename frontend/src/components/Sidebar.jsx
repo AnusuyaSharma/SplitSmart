@@ -7,10 +7,12 @@ import { MdDoneOutline } from "react-icons/md";
 import { MdAccessTime } from "react-icons/md";
 import { useSelector } from 'react-redux';
 import getInitials from '../../utils/getInitials';
+import { useNavigate } from 'react-router-dom';
 
 
 const Sidebar = () => {
   const user = useSelector((store) => store.user);
+  const navigate = useNavigate();
 
   return (
     <div className="drawer-side">
@@ -24,8 +26,8 @@ const Sidebar = () => {
       
       <ul className="menu bg-base-200 cursor-pointer text-white mt-4 w-full p-0 text-base">
         {/* Sidebar content here */}
-        <li className="flex flex-row cursor-pointer border-2 rounded-md border-[#414C51] font-medium hover:bg-[#36454F] mt-2"><button><LuLayoutDashboard />Dashboard</button></li>
-        <li className="flex flex-row cursor-pointer border-2 rounded-md border-[#414C51] font-medium hover:bg-[#36454F] mt-2"><button className="p-2"><MdGroup />Groups</button></li>
+        <li onClick={() => navigate("/")} className="flex flex-row cursor-pointer border-2 rounded-md border-[#414C51] font-medium hover:bg-[#36454F] mt-2"><button><LuLayoutDashboard />Dashboard</button></li>
+        <li onClick={() => navigate("/groups")} className="flex flex-row cursor-pointer border-2 rounded-md border-[#414C51] font-medium hover:bg-[#36454F] mt-2"><button className="p-2"><MdGroup />Groups</button></li>
         <li className="flex flex-row cursor-pointer border-2 rounded-md border-[#414C51] font-medium hover:bg-[#36454F] mt-2"><button className="p-2"><GiMoneyStack />Balances</button></li>
         <li className="flex flex-row cursor-pointer border-2 rounded-md border-[#414C51] font-medium hover:bg-[#36454F] mt-2"><button className="p-2"><MdDoneOutline />Settle Up</button></li>
         <li className="flex flex-row cursor-pointer border-2 rounded-md border-[#414C51] font-medium hover:bg-[#36454F] mt-2"><button className="p-2"><MdAccessTime />Acitivity</button></li>

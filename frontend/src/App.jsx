@@ -6,6 +6,7 @@ import appStore from "../utils/appStore.js";
 import Dashboard from "./components/Dashboard.jsx";
 import Profile from "./components/Profile.jsx";
 import SignUp from "./components/SignUp.jsx";
+import Groups from "./components/Groups.jsx";
 
 function App() {
   
@@ -18,6 +19,7 @@ function App() {
         <Route path="/" element={<Body />}>
           <Route index element={<Dashboard />} />
           <Route path="profile" element={<Profile/>} />
+          <Route path="groups" element={<Groups />} />
         </Route>
       </Routes>
     </BrowserRouter>
