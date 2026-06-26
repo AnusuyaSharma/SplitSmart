@@ -63,17 +63,16 @@ expenseRouter.post("/expense/add", userAuth, async(req,res) => {
 expenseRouter.get("/expense/group/:groupId", userAuth, async(req,res) => {
     try {
         const {groupId} = req.params;
-        console.log(groupId);
 
         if(!groupId){
             return res.status(400).send("Invalid groupId!");
         }
 
-        const expense = await Expense.findOne({groupId});
+        const expenses = await Expense.find({groupId}).populate("paidBy","name").populate("splitAmong.user", "name").sort({createdAt:-1});
 
         res.status(200).json({
             message:"Successfully fetched all the expenses of this group",
-            expense
+            expenses
         });
     } catch (error) {
         res.status(400).send("Error fetching expenses of this group!");

@@ -7,6 +7,9 @@ import Dashboard from "./components/Dashboard.jsx";
 import Profile from "./components/Profile.jsx";
 import SignUp from "./components/SignUp.jsx";
 import Groups from "./components/Groups.jsx";
+import Balances from "./components/Balances.jsx";
+import Settle from "./components/Settle.jsx";
+import GroupDetail from "./components/GroupDetail.jsx";
 
 function App() {
   
@@ -20,6 +23,9 @@ function App() {
           <Route index element={<Dashboard />} />
           <Route path="profile" element={<Profile/>} />
           <Route path="groups" element={<Groups />} />
+          <Route path="balances" element={<Balances />} />
+          <Route path="settle" element={<Settle />} />
+          <Route path="group/:groupId" element={<GroupDetail />} />
         </Route>
       </Routes>
     </BrowserRouter>

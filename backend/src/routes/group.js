@@ -54,7 +54,7 @@ groupRouter.get("/group/all", userAuth, async(req,res) =>{
 groupRouter.get("/group/:groupId", userAuth, async(req,res) => {
     try {
         const {groupId} = req.params;
-        const group = await Group.findById(groupId);
+        const group = await Group.findById(groupId).populate("members", "_id name");
         res.status(200).json({
             message:"Fetched group successfully!",
             group
