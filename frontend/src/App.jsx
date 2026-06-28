@@ -10,6 +10,7 @@ import Groups from "./components/Groups.jsx";
 import Balances from "./components/Balances.jsx";
 import Settle from "./components/Settle.jsx";
 import GroupDetail from "./components/GroupDetail.jsx";
+import ActivityPage from "./components/ActivityPage.jsx";
 
 function App() {
   
@@ -26,6 +27,7 @@ function App() {
           <Route path="balances" element={<Balances />} />
           <Route path="settle" element={<Settle />} />
           <Route path="group/:groupId" element={<GroupDetail />} />
+          <Route path="activity" element={<ActivityPage />} />
         </Route>
       </Routes>
     </BrowserRouter>

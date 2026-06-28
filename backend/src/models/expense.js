@@ -38,6 +38,8 @@ const expenseSchema = new mongoose.Schema({
             }
         },
     ],
+},{
+    timestamps:true
 });
 
 const Expense = mongoose.model("Expense", expenseSchema);

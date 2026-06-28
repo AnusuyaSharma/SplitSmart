@@ -7,6 +7,7 @@ import expenseRouter from "./routes/expense.js";
 import settlementRouter from "./routes/settlement.js";
 import balanceRouter from "./routes/balance.js";
 import cors from "cors";
+import activityRouter from "./routes/activity.js";
 
 const app = express();
 
@@ -19,7 +20,7 @@ app.use(
     })
 );
 
-app.use("/", authRouter, groupRouter, expenseRouter, settlementRouter, balanceRouter);
+app.use("/", authRouter, groupRouter, expenseRouter, settlementRouter, balanceRouter, activityRouter);
 
 connectDB()
     .then(() => {

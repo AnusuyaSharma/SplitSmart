@@ -29,8 +29,8 @@ const Sidebar = () => {
         <li onClick={() => navigate("/")} className="flex flex-row cursor-pointer border-2 rounded-md border-[#414C51] font-medium hover:bg-[#36454F] mt-2"><button><LuLayoutDashboard />Dashboard</button></li>
         <li onClick={() => navigate("/groups")} className="flex flex-row cursor-pointer border-2 rounded-md border-[#414C51] font-medium hover:bg-[#36454F] mt-2"><button className="p-2"><MdGroup />Groups</button></li>
         <li onClick={() => navigate("/balances")} className="flex flex-row cursor-pointer border-2 rounded-md border-[#414C51] font-medium hover:bg-[#36454F] mt-2"><button className="p-2"><GiMoneyStack />Balances</button></li>
-        <li onClick={() => navigate("/settle")} className="flex flex-row cursor-pointer border-2 rounded-md border-[#414C51] font-medium hover:bg-[#36454F] mt-2"><button className="p-2"><MdDoneOutline />Settle Up</button></li>
-        <li className="flex flex-row cursor-pointer border-2 rounded-md border-[#414C51] font-medium hover:bg-[#36454F] mt-2"><button className="p-2"><MdAccessTime />Acitivity</button></li>
+        {/* <li onClick={() => navigate("/settle")} className="flex flex-row cursor-pointer border-2 rounded-md border-[#414C51] font-medium hover:bg-[#36454F] mt-2"><button className="p-2"><MdDoneOutline />Settle Up</button></li> */}
+        <li onClick={() => navigate("/activity")} className="flex flex-row cursor-pointer border-2 rounded-md border-[#414C51] font-medium hover:bg-[#36454F] mt-2"><button className="p-2"><MdAccessTime />Acitivity</button></li>
       </ul>
       </div>
       <div className="flex flex-row items-center gap-2 text-lg">

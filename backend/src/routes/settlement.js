@@ -20,8 +20,8 @@ settlementRouter.post("/settlement/settle", userAuth, async(req,res) => {
             return res.status(400).send("Both users must be part of the group!");
         }
 
-        if(from !== req.user._id.toString()){
-            return res.status(400).send("Error settling another user's expense");
+        if(from !== req.user._id.toString() && to !== req.user._id.toString()){
+            return res.status(400).send("Not authorized to settle this expense!");
         }
 
         const expenses = await Expense.find({
