@@ -30,7 +30,13 @@ groupRouter.post("/group/create", userAuth, async(req,res) => {
 
         res.status(201).json({
             message:"Group created successfully!",
-            group
+            group: {
+                groupId: group._id,
+                groupName: group.name,
+                netBalance: 0,
+                members: group.members.length,
+                membersName: group.members
+            }
         });
 
     } catch (error) {

@@ -32,7 +32,7 @@ const Dashboard = () => {
     <div>
     <div className="border-b-2 border-b-[#001A28] text-white flex items-center justify-between px-4 pt-4 pb-2">
     <h1 className='text-xl font-semibold'>Dashboard</h1>
-    <button className="text-white bg-transparent border b-2 border-[#414C51] rounded-md py-2 px-4 font-semibold cursor-pointer text-lg flex flex-row gap-2 items-center mb-2"><FaPlus />Add Expense</button>
+    <button onClick={() => navigate("/groups")} className="text-white bg-transparent border b-2 border-[#414C51] rounded-md py-2 px-4 font-semibold cursor-pointer text-lg flex flex-row gap-2 items-center mb-2"><FaPlus />Add Expense</button>
     </div>
 
     {isLoading ? (<p className="px-4 pt-4 pb-2 mt-4">Loading...</p>) : (<div className="px-4 pt-4 pb-2 mt-4 flex gap-4 w-full">
