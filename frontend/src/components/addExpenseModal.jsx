@@ -4,13 +4,17 @@ import { BASE_URL } from '../../utils/constants';
 import getInitials from '../../utils/getInitials';
 import { useSelector } from 'react-redux';
 
-const AddExpenseModal = ({ groupId, members, onClose, onSuccess }) => {
+const AddExpenseModal = ({ groupId, members, onClose, onSuccess, prefill }) => {
   const user = useSelector((store) => store.user);
 
-  const [desc, setDesc] = useState('');
-  const [amt, setAmt] = useState('');
-  const [paidBy, setPaidBy] = useState(user._id);
-  const [checked, setChecked] = useState(new Set());
+  const [desc, setDesc] = useState(prefill?.description ||'');
+  const [amt, setAmt] = useState(prefill?.amount ? String(prefill.amount) : '');
+  const [paidBy, setPaidBy] = useState(prefill?.paidBy?._id || user._id);
+  const [checked, setChecked] = useState(
+    () => prefill?.members?.length > 0
+      ? new Set(prefill.members.map(m => m._id))
+      : new Set()
+  );
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 

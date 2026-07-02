@@ -6,6 +6,8 @@ import { FaPlus } from "react-icons/fa";
 import getInitials from '../../utils/getInitials';
 import { useSelector } from 'react-redux';
 import AddExpenseModal from './addExpenseModal';
+import { FaMicrophone } from "react-icons/fa";
+import useVoiceExpense from '../customHooks/useVoiceExpense'; 
 
 const GroupDetail = () => {
 
@@ -17,6 +19,9 @@ const GroupDetail = () => {
     const [settleModal, setSettleModal] = useState(false);
     const user = useSelector((store) => store.user);
     const [addExpenseModal, setAddExpenseModal] = useState(false);
+    const [prefill, setPrefill] = useState(null);
+
+    const { status: voiceStatus, result: voiceResult, error: voiceError, startListening, reset: resetVoice } = useVoiceExpense();
 
     const fetchGroup = async () => {
         try {
@@ -41,7 +46,6 @@ const GroupDetail = () => {
         try {
             const res = await axios.get(BASE_URL + `/balance/group/${groupId}`,{withCredentials:true});
             setGroupBalances(res.data.balances);
-            console.log(res.data.balances);
             setIsLoading(false);
         } catch (error) {
             console.log("Error fetching group's balances!");
@@ -54,6 +58,13 @@ const GroupDetail = () => {
         fetchGroupExpenses();
         fetchGroupBalances();
     },[]);
+
+    useEffect(() => {
+        if (voiceStatus === 'done' && voiceResult) {
+            setPrefill(voiceResult);
+            setAddExpenseModal(true);
+        }
+    }, [voiceStatus, voiceResult]);
 
     const expenseItems = groupExpenses.map((expense) => {
         const myShare = expense.splitAmong.find(split => split.user._id === user._id);
@@ -126,8 +137,30 @@ const GroupDetail = () => {
     <div>
         <div className="border-b-2 border-b-[#001A28] text-white flex items-center justify-between px-4 pt-4 pb-2">
         <h1 className='text-xl font-semibold'>{userGroup.name}</h1>
-        <button onClick={() => setAddExpenseModal(true)} className="text-white bg-transparent border b-2 border-[#414C51] rounded-md py-2 px-4 font-semibold cursor-pointer text-lg flex flex-row gap-2 items-center mb-2"><FaPlus />Add Expense</button>
+        <div className="flex gap-2 items-center">
+            <button
+                onClick={() => startListening(userGroup.members || [], user)}
+                disabled={voiceStatus === 'listening' || voiceStatus === 'processing'}
+                className={`text-white bg-transparent border border-[#414C51] rounded-md py-2 px-4 font-semibold cursor-pointer text-lg flex flex-row gap-2 items-center mb-2
+                    ${voiceStatus === 'listening' ? 'border-red-500 text-red-400 animate-pulse' : ''}
+                    ${voiceStatus === 'processing' ? 'border-yellow-500 text-yellow-400' : ''}
+                `}
+            >
+                <FaMicrophone />
+                {voiceStatus === 'listening' && 'Listening...'}
+                {voiceStatus === 'processing' && 'Thinking...'}
+                {(voiceStatus === 'idle' || voiceStatus === 'done' || voiceStatus === 'error') && 'Voice'}
+            </button>
+
+            <button onClick={() => setAddExpenseModal(true)} className="text-white bg-transparent border b-2 border-[#414C51] rounded-md py-2 px-4 font-semibold cursor-pointer text-lg flex flex-row gap-2 items-center mb-2">
+                <FaPlus />Add Expense
+            </button>
         </div>
+        {/* <button onClick={() => setAddExpenseModal(true)} className="text-white bg-transparent border b-2 border-[#414C51] rounded-md py-2 px-4 font-semibold cursor-pointer text-lg flex flex-row gap-2 items-center mb-2"><FaPlus />Add Expense</button> */}
+        </div>
+        {voiceError && (
+            <p className="text-red-400 text-sm px-4 py-2">{voiceError}</p>
+        )}
         <div className="flex gap-2 px-4 pt-4 pb-2 text-base font-bold flex-row items-center">
             {userGroup?.members?.map((member) => (
                 <div className="rounded-full flex flex-row items-center bg-[#003843] w-12 h-12 justify-center" key={member._id}>{getInitials(member.name)}</div>
@@ -213,11 +246,17 @@ const GroupDetail = () => {
     <AddExpenseModal
         groupId={groupId}
         members={userGroup.members || []}
-        onClose={() => setAddExpenseModal(false)}
+        prefill={prefill}
+        onClose={() => {setAddExpenseModal(false);
+                    setPrefill(null);
+                resetVoice();
+        }}
         onSuccess={() => {
         fetchGroupExpenses();
         fetchGroupBalances();
         setAddExpenseModal(false);
+        setPrefill(null);
+        resetVoice();
         }}
     />
     )}
