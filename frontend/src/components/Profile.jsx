@@ -3,7 +3,7 @@ import { useSelector } from 'react-redux';
 import getInitials from '../../utils/getInitials';
 import { BASE_URL } from '../../utils/constants';
 import axios from 'axios';
-import { addUser } from '../../utils/userSlice';
+import { addUser, removeUser } from '../../utils/userSlice';
 import { useDispatch } from 'react-redux';
 import {useNavigate} from 'react-router-dom';
 
@@ -64,6 +64,7 @@ const Profile = () => {
     const handleLogout = async () => {
         try {
             await axios.post(BASE_URL + "/logout", {withCredentials:true});
+            dispatch(removeUser());
             navigate("/login");
         } catch (error) {
             console.error("Error logging out");

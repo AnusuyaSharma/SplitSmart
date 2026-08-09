@@ -79,6 +79,36 @@ expenseRouter.get("/expense/group/:groupId", userAuth, async(req,res) => {
     }
 })
 
+expenseRouter.get("/expense/unpaid", userAuth, async(req,res) => {
+    try {
+        const {groupId, to} = req.query;
+        if(!groupId || !to){
+            return res.status(400).send("groupId and to are required!");
+        }
+
+        const group = await Group.findById(groupId);
+        if(!group){
+            return res.status(404).send("Group not found!");
+        }
+
+        const from = req.user._id.toString();
+
+        if(!group.members.includes(from) || !group.members.includes(to)){
+            return res.status(400).send("Both users must be part of the group!");
+        }
+
+        const expenses = await Expense.find({
+            groupId,
+            paidBy: to,
+            splitAmong: {$elemMatch: {user: from, isPaid: false}}
+        }).sort({createdAt: -1});
+
+        return res.status(200).json(expenses);
+    } catch (error) {
+        return res.status(400).send("Error fetching unpaid expenses!");
+    }
+})
+
 expenseRouter.patch("/expense/:expenseId", userAuth, async(req,res) => {
     try {
         const {expenseId} = req.params;
@@ -147,7 +177,6 @@ expenseRouter.patch("/expense/:expenseId", userAuth, async(req,res) => {
     }
 })
 
-
 //For fetching a single expense
 expenseRouter.get("/expense/:expenseId", userAuth, async(req,res) => {
     try {
@@ -186,38 +215,5 @@ expenseRouter.delete("/expense/:expenseId", userAuth, async (req,res) => {
         return res.status(400).send("Error deleting the expense!");
     }
 })
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 export default expenseRouter;

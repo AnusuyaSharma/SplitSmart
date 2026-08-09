@@ -1,3 +1,4 @@
+import "dotenv/config";
 import express from "express";
 import connectDB from "./config/database.js";
 import authRouter from "./routes/auth.js";
@@ -15,18 +16,20 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(
     cors({
-        origin:"http://localhost:5173",
+        origin: process.env.CLIENT_ORIGIN,
         credentials: true
     })
 );
 
 app.use("/", authRouter, groupRouter, expenseRouter, settlementRouter, balanceRouter, activityRouter);
 
+const PORT = process.env.PORT || 3000;
+
 connectDB()
     .then(() => {
         console.log("Database connected!");
-        app.listen(3000, () => {
-        console.log("Server is listening on port 3000");
+        app.listen(PORT, () => {
+        console.log(`Server is listening on port ${PORT}`);
         });
     })
     .catch((error) => {

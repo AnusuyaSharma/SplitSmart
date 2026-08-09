@@ -10,8 +10,8 @@ const groupSlice = createSlice({
         addGroup: (state,action) => {
             state.push(action.payload.group);       //adds one new group
         },
-        removeGroup: (action, payload) => {
-            return [];
+        removeGroup: (state, action) => {
+            return state.filter((group) => group.groupId !== action.payload);
         }
     }
 })

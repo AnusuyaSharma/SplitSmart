@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 
 const connectDB = async () => {
-    await mongoose.connect("mongodb+srv://anusuya23100_db_user:3gzfAXBMeqH48Thx@splitsmart.npzsrii.mongodb.net/SplitSmart");
+    await mongoose.connect(process.env.MONGODB_URI);
 };
 
 export default connectDB;

@@ -1,5 +1,4 @@
 const parseExpenseWithGemini = async (transcript, members, currentUserName) => {
-  const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
   const memberNames = members.map(m => m.name).join(', ');
 
   const prompt = `You are helping parse a voice-recorded expense for a bill-splitting app.

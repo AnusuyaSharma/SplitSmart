@@ -24,6 +24,9 @@ authRouter.post("/signup", async(req,res) => {
         const token = await savedUser.getJWT();
             res.cookie("token", token, {
                 expires: new Date(Date.now() + 900000),
+                httpOnly: true,
+                secure: process.env.NODE_ENV === "production",
+                sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
             });
 
         res.json({message: "User added successfully!!", savedUser});
@@ -48,6 +51,9 @@ authRouter.post("/login", async(req,res) => {
             const token = await user.getJWT();
             res.cookie("token", token, {
                 expires: new Date(Date.now() + 900000),
+                httpOnly: true,
+                secure: process.env.NODE_ENV === "production",
+                sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
             });
             return res.json({
                 message: "Login successful",
