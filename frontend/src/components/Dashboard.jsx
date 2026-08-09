@@ -5,6 +5,7 @@ import { BASE_URL } from '../../utils/constants';
 import { useNavigate } from 'react-router-dom';
 import GroupList from './GroupList';
 import { getBalanceSign } from '../../utils/getBalanceSign';
+import OutstandingBalances from './OutstandingBalances';
 
 const Dashboard = () => {
 
@@ -62,6 +63,9 @@ const Dashboard = () => {
         </div>
       </div>
     </div>)}
+
+
+    <OutstandingBalances />
 
     <div className="mt-4 px-6 flex flex-row items-center justify-between">
       <h3 className="text-[#C3B09B] font-bold text-md">YOUR GROUPS</h3>

@@ -69,6 +69,73 @@ settlementRouter.post("/settlement/settle", userAuth, async(req,res) => {
     }
 })
 
+//To settle the full net balance between two users across every group they share, in one action
+settlementRouter.post("/settlement/settle-user", userAuth, async(req,res) => {
+    try {
+        const {from,to} = req.body;
+
+        if(!from || !to){
+            return res.status(400).send("Both from and to users are required!");
+        }
+
+        if(from !== req.user._id.toString() && to !== req.user._id.toString()){
+            return res.status(400).send("Not authorized to settle with this user!");
+        }
+
+        const sharedGroups = await Group.find({members: {$all: [from,to]}});
+
+        const groupsSettled = [];
+
+        for(const group of sharedGroups){
+            const expenses = await Expense.find({
+                groupId: group._id,
+                paidBy: to,
+                splitAmong: {$elemMatch: {user: from, isPaid: false}}
+            });
+
+            if(expenses.length === 0) continue;    //nothing owed from "from" to "to" in this group
+
+            const expenseIds = expenses.map((expense) => expense._id);
+            const amount = expenses.reduce((sum, expense) => {
+                const share = expense.splitAmong.find(s => s.user.toString() === from);
+                return sum + (share ? share.share : 0);
+            }, 0);
+
+            await Expense.updateMany(
+                {_id: {$in: expenseIds}},
+                {$set: {"splitAmong.$[actualExpense].isPaid": true}},
+                {arrayFilters: [{"actualExpense.user": from}]}
+            );
+
+            const settlement = new Settlement({
+                from,
+                to,
+                groupId: group._id,
+                amount,
+                expenseIds
+            });
+
+            await settlement.save();
+
+            groupsSettled.push({
+                groupId: group._id,
+                groupName: group.name,
+                amount
+            });
+        }
+
+        const totalSettled = groupsSettled.reduce((sum, g) => sum + g.amount, 0);
+
+        return res.status(200).json({
+            message: "Successfully settled balances across all shared groups!",
+            totalSettled,
+            groupsSettled
+        });
+    } catch (error) {
+        return res.status(400).send("Error settling balances across groups!");
+    }
+})
+
 settlementRouter.get("/settlement/group/:groupId", userAuth, async(req,res) => {
     try {
         const {groupId} = req.params;
